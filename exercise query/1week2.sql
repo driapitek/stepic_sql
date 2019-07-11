@@ -34,3 +34,12 @@ from store
 group by category
 order by sale desc
 limit 5;
+
+-- Выведите в качестве результата одного запроса общее количество заказов, сумму стоимостей (бюджетов) всех проектов, 
+-- средний срок исполнения заказа в днях.
+
+select 
+ count(1) as 'count of order',
+ sum(budget) as 'total budget',
+ avg(datediff(project_finish, project_start))
+ from project;
