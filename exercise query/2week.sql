@@ -120,3 +120,37 @@ inner join sale
 inner join status 
 		on sale.status_id = status.id
 	where status.name = 'delivering';
+    
+    
+-- Выведите список всех категорий продуктов и количество продаж товаров, относящихся к данной категории. Под количеством продаж товаров подразумевается суммарное количество единиц товара данной категории, фигурирующих в заказах с любым статусом.
+    
+select  * from category_has_good;
+select	* from category;
+select	* from good;
+
+select category.name, count(sale.sale_sum) as sale_num from category 
+	left outer join category_has_good
+		on category.id = category_has_good.category_id
+	left outer join good
+		on category_has_good.good_id = good.id
+	left outer join sale_has_good
+		on good.id = sale_has_good.good_id
+	left outer join sale
+		on sale.id = sale_has_good.sale_id
+group by category.name;
+
+
+-- Выведите список источников, из которых не было клиентов, либо клиенты пришедшие из которых не совершали заказов или отказывались от заказов. Под клиентами, которые отказывались от заказов, необходимо понимать клиентов, у которых есть заказы, которые на момент выполнения запроса находятся в состоянии 'rejected'. В запросе необходимо использовать оператор UNION для объединения выборок по разным условиям.
+
+select source.name from source 
+	right outer join client
+		on source.id = client.source_id
+	right outer join sale
+		on client.id = sale.client_id
+	right outer join status
+		on sale.status_id = status.id
+where status.name = 'rejected'
+union
+select source.name from source
+  where not exists (select * from client 
+	where client.source_id = source.id);
